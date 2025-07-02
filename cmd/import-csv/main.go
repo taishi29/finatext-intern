@@ -4,6 +4,9 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"strconv"
+
+	"github.com/taishi29/finatext-intern/internal/model"
 )
 
 func main() {
@@ -26,7 +29,25 @@ func main() {
 	}
 
 	// CSVの内容を表示
-	for _, record := range records {
-		fmt.Println(record)
+	for i, record := range records {
+		if i == 0 {
+			continue // ヘッダー行をスキップ
+		}
+
+		quantity, err := strconv.Atoi(record[2])
+		if err != nil {
+			fmt.Println("Quantityの変換エラー:", err)
+			continue
+		}
+
+		trade := model.Trade{
+			UserID:    record[0],
+			FundID:    record[1],
+			Quantity:  quantity,
+			TradeDate: record[3],
+		}
+
+		fmt.Printf("構造体: %+v\n", trade)
+
 	}
 }
