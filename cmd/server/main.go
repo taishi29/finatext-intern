@@ -1,20 +1,17 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
+
+	"github.com/taishi29/finatext-intern/internal/handler"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		response := map[string]string{"status": "ok"}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(response)
-	})
+	// ルーティング設定（URLと関数の対応づけ）
+	http.HandleFunc("/", handler.GetTradeCountHandler)
 
-	fmt.Println("🚀 サーバー起動中 → http://localhost:8080")
-	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
-		panic(err)
-	}
+	// ポート8080でHTTPサーバーを起動して、もし失敗したら（Listenできなかったら）エラーを出して終了する
+	log.Println("Listening on :8080...")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
