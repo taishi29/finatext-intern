@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/taishi29/finatext-intern/internal/db"
-	"github.com/taishi29/finatext-intern/internal/model"
 )
 
 func main() {
@@ -20,20 +19,19 @@ func main() {
 	}
 	defer conn.Close()
 
-	// === trade_history.csv を読み込んでDBにINSERT ===
+	// trade_history の取り込み
 	if err := importTradeHistory(conn); err != nil {
 		fmt.Println("❌ trade_historyの取り込みに失敗:", err)
 		return
 	}
 
-	// === reference_prices.csv を読み込んでDBにINSERT ===
+	// reference_prices の取り込み
 	if err := importReferencePrices(conn); err != nil {
 		fmt.Println("❌ reference_pricesの取り込みに失敗:", err)
 		return
 	}
 }
 
-// Trade履歴の取り込み
 func importTradeHistory(conn *sql.DB) error {
 	file, err := os.Open("data/trade_history.csv")
 	if err != nil {
@@ -47,41 +45,35 @@ func importTradeHistory(conn *sql.DB) error {
 		return fmt.Errorf("CSV読み込み失敗: %w", err)
 	}
 
-	for i, record := range records {
+	for i, rec := range records {
 		if i == 0 {
 			continue // ヘッダーをスキップ
 		}
 
-		quantity, err := strconv.Atoi(record[2])
+		qty, err := strconv.Atoi(rec[2])
 		if err != nil {
 			fmt.Println("数量変換エラー:", err)
 			continue
 		}
 
-		trade := model.Trade{
-			UserID:    record[0],
-			FundID:    record[1],
-			Quantity:  quantity,
-			TradeDate: record[3],
-		}
-
+		// 重複行はスキップ
 		_, err = conn.Exec(`
-			INSERT INTO trade_history (user_id, fund_id, quantity, trade_date)
+			INSERT IGNORE INTO trade_history 
+			   (user_id, fund_id, quantity, trade_date)
 			VALUES (?, ?, ?, ?)
-		`, trade.UserID, trade.FundID, trade.Quantity, trade.TradeDate)
-
+		`, rec[0], rec[1], qty, rec[3])
 		if err != nil {
-			fmt.Println("INSERTエラー（trade）:", err)
+			fmt.Println("INSERTエラー（trade_history）:", err)
 			continue
 		}
 
-		fmt.Printf("✅ 保存完了（trade_history）: %+v\n", trade)
+		fmt.Printf("✅ 保存完了（trade_history）: user=%s fund=%s date=%s qty=%d\n",
+			rec[0], rec[1], rec[3], qty)
 	}
 
 	return nil
 }
 
-// Reference価格の取り込み
 func importReferencePrices(conn *sql.DB) error {
 	file, err := os.Open("data/reference_prices.csv")
 	if err != nil {
@@ -97,7 +89,7 @@ func importReferencePrices(conn *sql.DB) error {
 
 	for i, row := range records {
 		if i == 0 {
-			continue
+			continue // ヘッダーをスキップ
 		}
 
 		price, err := strconv.Atoi(row[1])
@@ -106,23 +98,19 @@ func importReferencePrices(conn *sql.DB) error {
 			continue
 		}
 
-		ref := model.ReferencePrice{
-			FundID:             row[0],
-			ReferencePriceDate: row[2],
-			ReferencePrice:     price,
-		}
-
+		// 重複行はスキップ
 		_, err = conn.Exec(`
-			INSERT INTO reference_prices (fund_id, reference_price_date, reference_price)
+			INSERT IGNORE INTO reference_prices 
+			   (fund_id, reference_price_date, reference_price)
 			VALUES (?, ?, ?)
-		`, ref.FundID, ref.ReferencePriceDate, ref.ReferencePrice)
-
+		`, row[0], row[2], price)
 		if err != nil {
-			fmt.Println("INSERTエラー（reference）:", err)
+			fmt.Println("INSERTエラー（reference_prices）:", err)
 			continue
 		}
 
-		fmt.Printf("✅ 保存完了（reference_prices）: %+v\n", ref)
+		fmt.Printf("✅ 保存完了（reference_prices）: fund=%s date=%s price=%d\n",
+			row[0], row[2], price)
 	}
 
 	return nil
