@@ -19,14 +19,14 @@ func GetAssetHandler(w http.ResponseWriter, r *http.Request) {
     }
     conn, err := db.Connect()
     if err != nil {
-        http.Error(w, "db error", http.StatusInternalServerError)
+        http.Error(w, "データベースエラー", http.StatusInternalServerError)
         return
     }
     defer conn.Close()
 
     asset, err := model.CalculateAsset(conn, userID)
     if err != nil {
-        http.Error(w, "calculation error", http.StatusInternalServerError)
+        http.Error(w, "計算失敗", http.StatusInternalServerError)
         return
     }
 
@@ -50,14 +50,14 @@ func GetAssetAtDateHandler(w http.ResponseWriter, r *http.Request) {
 
     conn, err := db.Connect()
     if err != nil {
-        http.Error(w, "db error", http.StatusInternalServerError)
+        http.Error(w, "データベースエラー", http.StatusInternalServerError)
         return
     }
     defer conn.Close()
 
     asset, err := model.CalculateAssetAtDate(conn, userID, date)
     if err != nil {
-        http.Error(w, "calculation error: "+err.Error(), http.StatusInternalServerError)
+        http.Error(w, "計算失敗: "+err.Error(), http.StatusInternalServerError)
         return
     }
 

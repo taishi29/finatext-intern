@@ -14,20 +14,20 @@ func main() {
 	// DB接続
 	conn, err := db.Connect()
 	if err != nil {
-		fmt.Println("❌ DB接続失敗:", err)
+		fmt.Println("DB接続失敗:", err)
 		return
 	}
 	defer conn.Close()
 
 	// trade_history の取り込み
 	if err := importTradeHistory(conn); err != nil {
-		fmt.Println("❌ trade_historyの取り込みに失敗:", err)
+		fmt.Println("trade_historyの取り込みに失敗:", err)
 		return
 	}
 
 	// reference_prices の取り込み
 	if err := importReferencePrices(conn); err != nil {
-		fmt.Println("❌ reference_pricesの取り込みに失敗:", err)
+		fmt.Println("reference_pricesの取り込みに失敗:", err)
 		return
 	}
 }
@@ -67,7 +67,7 @@ func importTradeHistory(conn *sql.DB) error {
 			continue
 		}
 
-		fmt.Printf("✅ 保存完了（trade_history）: user=%s fund=%s date=%s qty=%d\n",
+		fmt.Printf("保存完了（trade_history）: user=%s fund=%s date=%s qty=%d\n",
 			rec[0], rec[1], rec[3], qty)
 	}
 
@@ -109,7 +109,7 @@ func importReferencePrices(conn *sql.DB) error {
 			continue
 		}
 
-		fmt.Printf("✅ 保存完了（reference_prices）: fund=%s date=%s price=%d\n",
+		fmt.Printf("保存完了（reference_prices）: fund=%s date=%s price=%d\n",
 			row[0], row[2], price)
 	}
 

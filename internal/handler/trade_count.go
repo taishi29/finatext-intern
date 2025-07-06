@@ -19,14 +19,14 @@ func GetTradeCountHandler(w http.ResponseWriter, r *http.Request) {
 
     conn, err := db.Connect()
     if err != nil {
-        http.Error(w, "db error", http.StatusInternalServerError)
+        http.Error(w, "データベースエラー", http.StatusInternalServerError)
         return
     }
     defer conn.Close()
 
     count, err := model.GetTradeCountByUserID(conn, userID)
     if err != nil {
-        http.Error(w, "query error", http.StatusInternalServerError)
+        http.Error(w, "データベースへの問い合わせに失敗", http.StatusInternalServerError)
         return
     }
 

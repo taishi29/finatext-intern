@@ -17,18 +17,18 @@ func Connect() (*sql.DB, error) {
 	for i := 0; i < 5; i++ {
 		db, err = sql.Open("mysql", dsn)
 		if err != nil {
-			fmt.Printf("🔁 DB接続失敗（Open）: %v\n", err)
+			fmt.Printf("DB接続失敗（Open）: %v\n", err)
 			time.Sleep(2 * time.Second)
 			continue
 		}
 
 		err = db.Ping()
 		if err == nil {
-			fmt.Println("✅ DB接続成功")
+			fmt.Println("DB接続成功")
 			return db, nil
 		}
 
-		fmt.Printf("🔁 DB接続失敗（Ping）: %v\n", err)
+		fmt.Printf("DB接続失敗（Ping）: %v\n", err)
 		time.Sleep(2 * time.Second)
 	}
 
