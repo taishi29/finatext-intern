@@ -12,6 +12,12 @@ import (
 // Step4: 現在の資産評価額、評価損益を返す関数
 func GetAssetHandler(w http.ResponseWriter, r *http.Request) {
     userID := chi.URLParam(r, "user_id")
+    date := r.URL.Query().Get("date")
+
+    if date != "" {
+        GetAssetAtDateHandler(w, r)
+        return
+    }
 
 	if userID == "" {
         http.Error(w, "ユーザーIDが指定されていません。", http.StatusBadRequest)
