@@ -16,6 +16,9 @@ func main() {
 
 	// Step4: 資産評価額と評価損益を返すAPI 
 	r.Get("/{user_id}/assets", handler.GetAssetHandler)
+
+	// Step5: 指定された日付における資産評価額と評価損益を返すAPI 
+	r.Get("/{user_id}/assets", handler.GetAssetAtDateHandler)
 	
     log.Println("Listening on :8080...")
     log.Fatal(http.ListenAndServe(":8080", r))
