@@ -5,13 +5,18 @@ import (
 	"net/http"
 
 	"github.com/taishi29/finatext-intern/internal/handler"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	// ルーティング設定（URLと関数の対応づけ）
-	http.HandleFunc("/", handler.GetTradeCountHandler)
+    r := chi.NewRouter()
 
-	// ポート8080でHTTPサーバーを起動して、もし失敗したら（Listenできなかったら）エラーを出して終了する
-	log.Println("Listening on :8080...")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+    // Step3: トレード数カウントAPI
+    r.Get("/{user_id}/trades", handler.GetTradeCountHandler)
+
+	// Step4: 資産評価額と評価損益を返すAPI 
+	r.Get("/{user_id}/assets", handler.GetAssetHandler)
+	
+    log.Println("Listening on :8080...")
+    log.Fatal(http.ListenAndServe(":8080", r))
 }
